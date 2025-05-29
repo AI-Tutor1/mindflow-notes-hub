@@ -1,7 +1,9 @@
 
-import { Book, Brain, Users, BarChart3, Settings, Plus } from "lucide-react";
+import { Brain, Users, Calculator, BarChart3, Settings, Bell, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -10,158 +12,209 @@ const Index = () => {
   const quickActions = [
     {
       title: "🧠 MindPages",
-      description: "Your digital notebook for notes, ideas, and learning",
+      description: "Create and organize your digital notes",
       icon: Brain,
       action: () => navigate("/mindpages"),
-      color: "bg-gradient-to-br from-blue-500 to-purple-600",
-    },
-    {
-      title: "📚 Courses",
-      description: "Access your enrolled courses and materials",
-      icon: Book,
-      action: () => {},
-      color: "bg-gradient-to-br from-green-500 to-teal-600",
+      color: "bg-blue-50 hover:bg-blue-100 border-blue-200",
+      iconColor: "text-blue-600"
     },
     {
       title: "👥 Study Groups",
-      description: "Collaborate with classmates and teachers",
+      description: "Join or create collaborative learning groups",
       icon: Users,
-      action: () => {},
-      color: "bg-gradient-to-br from-orange-500 to-red-600",
+      action: () => navigate("/study-groups"),
+      color: "bg-teal-50 hover:bg-teal-100 border-teal-200",
+      iconColor: "text-teal-600"
     },
     {
-      title: "📊 Progress",
-      description: "Track your learning journey and achievements",
+      title: "📊 Analytics",
+      description: "Track your learning progress and insights",
       icon: BarChart3,
       action: () => {},
-      color: "bg-gradient-to-br from-indigo-500 to-blue-600",
+      color: "bg-purple-50 hover:bg-purple-100 border-purple-200",
+      iconColor: "text-purple-600"
     },
+    {
+      title: "🔧 Settings",
+      description: "Customize your learning experience",
+      icon: Settings,
+      action: () => {},
+      color: "bg-gray-50 hover:bg-gray-100 border-gray-200",
+      iconColor: "text-gray-600"
+    }
+  ];
+
+  const recentActivities = [
+    {
+      type: "mindpage",
+      title: "Mathematics Chapter 5 Notes",
+      description: "Updated calculus formulas and examples",
+      time: "2 hours ago",
+      badge: "Updated"
+    },
+    {
+      type: "group",
+      title: "Physics Study Circle",
+      description: "New assignment: Quantum Mechanics Problems",
+      time: "4 hours ago",
+      badge: "New Assignment"
+    },
+    {
+      type: "mindpage",
+      title: "Project Ideas - AI Application",
+      description: "Added new chatbot features brainstorm",
+      time: "1 day ago",
+      badge: "Created"
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">Tuitional AI</h1>
+      <header className="bg-white border-b border-slate-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+            <p className="text-slate-600">Welcome back! Ready to learn something new?</p>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search anything..."
+                className="pl-10 w-64"
+              />
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
-                <Settings className="w-4 h-4" />
-              </Button>
-              <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                S
-              </div>
-            </div>
+            <Button variant="ghost" size="sm">
+              <Bell className="w-4 h-4" />
+            </Button>
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Quick Create
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">
-            Welcome back, Student!
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Your personalized learning dashboard. Access your courses, notes, and track your progress all in one place.
-          </p>
+      <div className="p-6">
+        {/* Quick Actions Grid */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-slate-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action, index) => (
+              <Card 
+                key={index}
+                className={`cursor-pointer transition-all hover:shadow-lg ${action.color}`}
+                onClick={action.action}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className={`p-2 rounded-lg bg-white ${action.iconColor}`}>
+                      <action.icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">{action.title}</h3>
+                      <p className="text-sm text-slate-600 mt-1">{action.description}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Quick Actions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {quickActions.map((action, index) => (
-            <Card
-              key={index}
-              className="group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl border-0 overflow-hidden"
-              onClick={action.action}
-            >
-              <div className={`h-2 ${action.color}`} />
-              <CardHeader className="pb-3">
-                <div className="flex items-center space-x-3">
-                  <div className={`p-2 rounded-lg ${action.color} text-white`}>
-                    <action.icon className="w-5 h-5" />
-                  </div>
-                  <CardTitle className="text-lg font-semibold text-slate-900">
-                    {action.title}
-                  </CardTitle>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Activity */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <span>Recent Activity</span>
+                  <Badge variant="secondary">3 updates</Badge>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-slate-600">
-                  {action.description}
-                </CardDescription>
+                <div className="space-y-4">
+                  {recentActivities.map((activity, index) => (
+                    <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-slate-50 transition-colors">
+                      <div className={`p-2 rounded-lg ${
+                        activity.type === 'mindpage' ? 'bg-blue-100 text-blue-600' : 'bg-teal-100 text-teal-600'
+                      }`}>
+                        {activity.type === 'mindpage' ? <Brain className="w-4 h-4" /> : <Users className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-slate-900">{activity.title}</h4>
+                          <Badge variant={activity.badge === 'New Assignment' ? 'destructive' : 'secondary'} className="text-xs">
+                            {activity.badge}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">{activity.description}</p>
+                        <p className="text-xs text-slate-500 mt-2">{activity.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
-          ))}
+          </div>
+
+          {/* Quick Stats */}
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Learning Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">MindPages Created</span>
+                    <span className="font-semibold text-slate-900">24</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Study Groups</span>
+                    <span className="font-semibold text-slate-900">3</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Hours Studied</span>
+                    <span className="font-semibold text-slate-900">127</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-600">Assignments Due</span>
+                    <span className="font-semibold text-red-600">2</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Deadlines */}
+            <Card className="mt-4">
+              <CardHeader>
+                <CardTitle>Upcoming Deadlines</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">Physics Quiz</p>
+                      <p className="text-xs text-slate-500">Tomorrow, 2:00 PM</p>
+                    </div>
+                    <Badge variant="destructive">Due Soon</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">Math Assignment</p>
+                      <p className="text-xs text-slate-500">Friday, 11:59 PM</p>
+                    </div>
+                    <Badge variant="secondary">Upcoming</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-
-        {/* Recent Activity */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold text-slate-900">Recent Activity</CardTitle>
-            <CardDescription>Your latest interactions and progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { type: "note", title: "Mathematics Chapter 5 Notes", time: "2 hours ago", color: "bg-blue-100 text-blue-800" },
-                { type: "course", title: "Completed Physics Quiz", time: "Yesterday", color: "bg-green-100 text-green-800" },
-                { type: "mindpage", title: "Created Study Plan for Finals", time: "2 days ago", color: "bg-purple-100 text-purple-800" },
-              ].map((item, index) => (
-                <div key={index} className="flex items-center space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${item.color}`}>
-                    {item.type}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-slate-900">{item.title}</p>
-                    <p className="text-sm text-slate-500">{item.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick MindPages Access */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl font-bold text-slate-900 flex items-center space-x-2">
-                  <Brain className="w-6 h-6 text-blue-600" />
-                  <span>MindPages</span>
-                </CardTitle>
-                <CardDescription>Your digital notebook for learning</CardDescription>
-              </div>
-              <Button onClick={() => navigate("/mindpages")} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                New Page
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { title: "Study Notes", pages: 12, updated: "Today" },
-                { title: "Project Ideas", pages: 5, updated: "Yesterday" },
-                { title: "Quick Thoughts", pages: 8, updated: "2 days ago" },
-              ].map((folder, index) => (
-                <div key={index} className="p-4 bg-white rounded-lg border border-blue-100 hover:border-blue-300 transition-colors cursor-pointer">
-                  <h4 className="font-semibold text-slate-900 mb-1">{folder.title}</h4>
-                  <p className="text-sm text-slate-500">{folder.pages} pages • Updated {folder.updated}</p>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+      </div>
     </div>
   );
 };

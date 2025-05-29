@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
-import { Bold, Italic, Underline, List, ListOrdered, Heading1, Heading2, Link, Code, Table, Star, Download, Share, Save, Tag, Clock } from "lucide-react";
+import { Bold, Italic, Underline, List, ListOrdered, Heading1, Heading2, Link, Code, Table, Star, Download, Share, Save, Tag, Clock, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,16 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { MindPage } from "@/pages/MindPages";
 import { useToast } from "@/hooks/use-toast";
+import { TagsManager } from "./TagsManager";
+import { ImageUpload } from "./ImageUpload";
+import { ShareDialog } from "./ShareDialog";
+
+interface UploadedImage {
+  id: string;
+  url: string;
+  name: string;
+  size: number;
+}
 
 interface MindPageEditorProps {
   page: MindPage;
@@ -20,9 +30,12 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
   const [title, setTitle] = useState(page.title);
   const [content, setContent] = useState(page.content);
   const [tags, setTags] = useState<string[]>(page.tags);
-  const [newTag, setNewTag] = useState("");
   const [isStarred, setIsStarred] = useState(page.is_starred);
   const [lastSaved, setLastSaved] = useState(new Date());
+  const [images, setImages] = useState<UploadedImage[]>([]);
+  const [folder, setFolder] = useState(page.folder || "");
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -38,13 +51,13 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
   // Auto-save functionality
   useEffect(() => {
     const saveTimer = setTimeout(() => {
-      if (title !== page.title || content !== page.content || isStarred !== page.is_starred || JSON.stringify(tags) !== JSON.stringify(page.tags)) {
+      if (title !== page.title || content !== page.content || isStarred !== page.is_starred || JSON.stringify(tags) !== JSON.stringify(page.tags) || folder !== page.folder) {
         handleSave();
       }
     }, 2000);
 
     return () => clearTimeout(saveTimer);
-  }, [title, content, tags, isStarred]);
+  }, [title, content, tags, isStarred, folder]);
 
   const handleSave = () => {
     const updatedPage: MindPage = {
@@ -53,6 +66,7 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
       content,
       tags,
       is_starred: isStarred,
+      folder: folder || undefined,
     };
     onUpdate(updatedPage);
     setLastSaved(new Date());
@@ -66,15 +80,16 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
     }
   };
 
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag("");
+  const createFolder = () => {
+    if (newFolderName.trim()) {
+      setFolder(newFolderName.trim());
+      setNewFolderName("");
+      setIsCreatingFolder(false);
+      toast({
+        title: "Folder created",
+        description: `Page moved to "${newFolderName.trim()}" folder`,
+      });
     }
-  };
-
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const exportPage = () => {
@@ -152,9 +167,7 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
             <Button variant="ghost" size="sm" onClick={exportPage}>
               <Download className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
-              <Share className="w-4 h-4" />
-            </Button>
+            <ShareDialog pageTitle={title} pageId={page.id} />
             <Button size="sm" onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
               <Save className="w-4 h-4 mr-2" />
               Save
@@ -162,49 +175,89 @@ export const MindPageEditor = ({ page, onUpdate, isCreating, onCreatingComplete 
           </div>
         </div>
 
-        {/* Tags */}
-        <div className="flex items-center space-x-2 mb-4">
-          <Tag className="w-4 h-4 text-slate-400" />
-          <div className="flex flex-wrap items-center gap-2">
-            {tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="cursor-pointer hover:bg-slate-200"
-                onClick={() => removeTag(tag)}
-              >
-                {tag} ×
-              </Badge>
-            ))}
-            <div className="flex items-center space-x-2">
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && addTag()}
-                placeholder="Add tag..."
-                className="w-24 h-6 text-xs border-dashed"
-              />
-              <Button size="sm" variant="ghost" onClick={addTag} className="h-6 px-2 text-xs">
-                Add
-              </Button>
+        {/* Folder and Tags Row */}
+        <div className="flex items-center space-x-4 mb-4">
+          {/* Folder Management */}
+          <div className="flex items-center space-x-2">
+            <FolderPlus className="w-4 h-4 text-slate-400" />
+            {isCreatingFolder ? (
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && createFolder()}
+                  placeholder="Folder name..."
+                  className="w-32 h-6 text-xs"
+                />
+                <Button size="sm" variant="ghost" onClick={createFolder} className="h-6 px-2 text-xs">
+                  Save
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setIsCreatingFolder(false)} className="h-6 px-2 text-xs">
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                {folder ? (
+                  <Badge variant="outline" className="text-xs">
+                    📁 {folder}
+                  </Badge>
+                ) : (
+                  <span className="text-xs text-slate-500">No folder</span>
+                )}
+                <Button 
+                  size="sm" 
+                  variant="ghost" 
+                  onClick={() => setIsCreatingFolder(true)}
+                  className="h-6 px-2 text-xs"
+                >
+                  {folder ? "Change" : "Add Folder"}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <Separator orientation="vertical" className="h-4" />
+
+          {/* Tags */}
+          <div className="flex items-center space-x-2">
+            <Tag className="w-4 h-4 text-slate-400" />
+            <div className="flex flex-wrap items-center gap-2">
+              {tags.slice(0, 3).map((tag) => (
+                <Badge key={tag} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {tags.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{tags.length - 3} more
+                </Badge>
+              )}
+              <TagsManager tags={tags} onTagsChange={setTags} />
             </div>
           </div>
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center space-x-1">
-          {toolbarButtons.map((button, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="sm"
-              onClick={() => formatContent(button.command, button.value)}
-              className="h-8 w-8 p-0 hover:bg-slate-100"
-              title={button.tooltip}
-            >
-              <button.icon className="w-4 h-4" />
-            </Button>
-          ))}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1">
+            {toolbarButtons.map((button, index) => (
+              <Button
+                key={index}
+                variant="ghost"
+                size="sm"
+                onClick={() => formatContent(button.command, button.value)}
+                className="h-8 w-8 p-0 hover:bg-slate-100"
+                title={button.tooltip}
+              >
+                <button.icon className="w-4 h-4" />
+              </Button>
+            ))}
+          </div>
+          
+          <div className="flex items-center space-x-1">
+            <ImageUpload images={images} onImagesChange={setImages} />
+          </div>
         </div>
       </div>
 
