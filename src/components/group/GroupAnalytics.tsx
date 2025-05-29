@@ -16,7 +16,8 @@ import {
   Search,
   Filter,
   Download,
-  Eye
+  Eye,
+  FileText
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
