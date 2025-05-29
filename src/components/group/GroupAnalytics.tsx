@@ -1,7 +1,28 @@
 
-import { TrendingUp, Users, Award, Clock, BarChart3, PieChart } from "lucide-react";
+import { TrendingUp, Users, Award, Clock, BarChart3, PieChart, Calendar, Target, BookOpen, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { 
+  LineChart, 
+  Line, 
+  AreaChart, 
+  Area, 
+  BarChart, 
+  Bar, 
+  PieChart as RechartsPieChart, 
+  Cell, 
+  RadarChart, 
+  Radar, 
+  PolarGrid, 
+  PolarAngleAxis, 
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend
+} from "recharts";
 
 interface StudyGroup {
   id: string;
@@ -14,238 +35,301 @@ interface GroupAnalyticsProps {
 }
 
 export const GroupAnalytics = ({ group }: GroupAnalyticsProps) => {
-  // Sample analytics data - in real app, fetch from API
-  const analyticsData = {
-    performance: {
-      avgScore: 87,
-      improvement: 5.2,
-      completionRate: 92,
-      participationRate: 78
-    },
-    assignments: {
-      total: 12,
-      completed: 10,
-      pending: 2,
-      avgSubmissionTime: 2.3
-    },
-    engagement: {
-      activeMembers: 23,
-      totalMembers: 25,
-      messagesThisWeek: 156,
-      studySessionsThisWeek: 8
-    },
-    topicMastery: [
-      { topic: "Derivatives", mastery: 94, students: 24 },
-      { topic: "Integration", mastery: 87, students: 23 },
-      { topic: "Limits", mastery: 91, students: 25 },
-      { topic: "Functions", mastery: 85, students: 22 },
-      { topic: "Algebra", mastery: 96, students: 25 }
-    ],
-    weeklyProgress: [
-      { week: "Week 1", avgScore: 78, participation: 65 },
-      { week: "Week 2", avgScore: 82, participation: 72 },
-      { week: "Week 3", avgScore: 85, participation: 78 },
-      { week: "Week 4", avgScore: 87, participation: 82 }
-    ],
-    topPerformers: [
-      { name: "Alex Chen", avgScore: 96, improvement: 8 },
-      { name: "Sophie Kim", avgScore: 94, improvement: 6 },
-      { name: "Emma Rodriguez", avgScore: 92, improvement: 4 },
-      { name: "James Wilson", avgScore: 89, improvement: 7 }
-    ]
+  // Enhanced analytics data with more comprehensive metrics
+  const performanceData = [
+    { month: "Jan", avgScore: 78, participation: 65, assignments: 12, improvement: 2 },
+    { month: "Feb", avgScore: 82, participation: 72, assignments: 14, improvement: 4 },
+    { month: "Mar", avgScore: 85, participation: 78, assignments: 16, improvement: 3 },
+    { month: "Apr", avgScore: 87, participation: 82, assignments: 18, improvement: 2 },
+    { month: "May", avgScore: 91, participation: 88, assignments: 20, improvement: 4 }
+  ];
+
+  const topicMasteryData = [
+    { topic: "Algebra", mastery: 95, students: 25, difficulty: "Medium" },
+    { topic: "Calculus", mastery: 87, students: 23, difficulty: "Hard" },
+    { topic: "Geometry", mastery: 92, students: 24, difficulty: "Easy" },
+    { topic: "Statistics", mastery: 89, students: 22, difficulty: "Medium" },
+    { topic: "Trigonometry", mastery: 84, students: 20, difficulty: "Hard" }
+  ];
+
+  const engagementData = [
+    { name: "Active Students", value: 23, color: "#0EA5E9" },
+    { name: "Occasional Students", value: 7, color: "#10B981" },
+    { name: "Inactive Students", value: 2, color: "#F59E0B" }
+  ];
+
+  const assignmentAnalytics = [
+    { assignment: "Quiz 1", submitted: 25, pending: 0, avgScore: 88, dueDate: "2024-01-15" },
+    { assignment: "Homework 3", submitted: 23, pending: 2, avgScore: 91, dueDate: "2024-01-20" },
+    { assignment: "Project A", submitted: 20, pending: 5, avgScore: 85, dueDate: "2024-01-25" },
+    { assignment: "Quiz 2", submitted: 24, pending: 1, avgScore: 89, dueDate: "2024-01-30" }
+  ];
+
+  const studentProgressData = [
+    { student: "Alex Chen", algebra: 95, calculus: 88, geometry: 92, statistics: 85, trigonometry: 90 },
+    { student: "Sophie Kim", algebra: 88, calculus: 91, geometry: 87, statistics: 94, trigonometry: 86 },
+    { student: "Emma Rodriguez", algebra: 92, calculus: 85, geometry: 94, statistics: 88, trigonometry: 89 }
+  ];
+
+  const weeklyActivityData = [
+    { week: "Week 1", messages: 45, sessions: 12, resources: 8, quizzes: 3 },
+    { week: "Week 2", messages: 67, sessions: 15, resources: 12, quizzes: 4 },
+    { week: "Week 3", messages: 89, sessions: 18, resources: 15, quizzes: 5 },
+    { week: "Week 4", messages: 156, sessions: 22, resources: 18, quizzes: 6 }
+  ];
+
+  const chartConfig = {
+    avgScore: { label: "Average Score", color: "#0EA5E9" },
+    participation: { label: "Participation", color: "#10B981" },
+    assignments: { label: "Assignments", color: "#F59E0B" },
+    improvement: { label: "Improvement", color: "#8B5CF6" }
   };
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h2>
-        <p className="text-slate-600">Comprehensive insights into group performance and engagement</p>
-      </div>
-
-      {/* Key Metrics */}
+      {/* Header with Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Average Score</CardTitle>
-            <TrendingUp className="w-4 h-4 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-blue-700">Average Performance</CardTitle>
+            <TrendingUp className="w-4 h-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{analyticsData.performance.avgScore}%</div>
-            <p className="text-xs text-green-600">
-              +{analyticsData.performance.improvement}% from last month
-            </p>
+            <div className="text-2xl font-bold text-blue-900">91%</div>
+            <p className="text-xs text-blue-600">+4% from last month</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Completion Rate</CardTitle>
-            <Award className="w-4 h-4 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-green-700">Engagement Rate</CardTitle>
+            <Users className="w-4 h-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{analyticsData.performance.completionRate}%</div>
-            <p className="text-xs text-slate-500">
-              {analyticsData.assignments.completed}/{analyticsData.assignments.total} assignments
-            </p>
+            <div className="text-2xl font-bold text-green-900">88%</div>
+            <p className="text-xs text-green-600">23/25 active students</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Active Members</CardTitle>
-            <Users className="w-4 h-4 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-purple-700">Completion Rate</CardTitle>
+            <Award className="w-4 h-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">
-              {analyticsData.engagement.activeMembers}/{analyticsData.engagement.totalMembers}
-            </div>
-            <p className="text-xs text-slate-500">
-              {Math.round((analyticsData.engagement.activeMembers / analyticsData.engagement.totalMembers) * 100)}% participation rate
-            </p>
+            <div className="text-2xl font-bold text-purple-900">94%</div>
+            <p className="text-xs text-purple-600">Above target</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Avg. Submission Time</CardTitle>
-            <Clock className="w-4 h-4 text-teal-600" />
+            <CardTitle className="text-sm font-medium text-orange-700">Study Time</CardTitle>
+            <Clock className="w-4 h-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{analyticsData.assignments.avgSubmissionTime} days</div>
-            <p className="text-xs text-green-600">Ahead of schedule</p>
+            <div className="text-2xl font-bold text-orange-900">2.3h</div>
+            <p className="text-xs text-orange-600">avg per week</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Topic Mastery */}
+      {/* Performance Trends Chart */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-teal-600" />
-            Topic Mastery Overview
+            <BarChart3 className="w-5 h-5 text-blue-600" />
+            Performance Trends Over Time
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {analyticsData.topicMastery.map((topic) => (
-              <div key={topic.topic} className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-700">{topic.topic}</span>
-                  <div className="text-right">
-                    <span className="font-semibold text-slate-900">{topic.mastery}%</span>
-                    <span className="text-slate-500 ml-2">({topic.students} students)</span>
-                  </div>
-                </div>
-                <Progress value={topic.mastery} className="h-2" />
+          <ChartContainer config={chartConfig} className="h-[300px]">
+            <AreaChart data={performanceData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Area 
+                type="monotone" 
+                dataKey="avgScore" 
+                stroke="#0EA5E9" 
+                fill="#0EA5E9" 
+                fillOpacity={0.3}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="participation" 
+                stroke="#10B981" 
+                fill="#10B981" 
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Topic Mastery and Engagement */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Topic Mastery Bar Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-green-600" />
+              Topic Mastery Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <BarChart data={topicMasteryData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="topic" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="mastery" fill="#10B981" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        {/* Engagement Distribution Pie Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="w-5 h-5 text-purple-600" />
+              Student Engagement Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[250px]">
+              <RechartsPieChart>
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <RechartsPieChart dataKey="value" data={engagementData} cx="50%" cy="50%" outerRadius={80}>
+                  {engagementData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </RechartsPieChart>
+                <Legend />
+              </RechartsPieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Assignment Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="w-5 h-5 text-teal-600" />
+            Assignment Performance Analysis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[300px]">
+            <BarChart data={assignmentAnalytics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="assignment" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="submitted" fill="#0EA5E9" name="Submitted" />
+              <Bar dataKey="pending" fill="#F59E0B" name="Pending" />
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Student Progress Radar Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="w-5 h-5 text-indigo-600" />
+            Individual Student Progress (Top 3)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {studentProgressData.map((student, index) => (
+              <div key={student.student} className="text-center">
+                <h4 className="font-medium mb-2">{student.student}</h4>
+                <ChartContainer config={chartConfig} className="h-[200px]">
+                  <RadarChart data={[student]} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="subject" />
+                    <PolarRadiusAxis angle={0} domain={[0, 100]} />
+                    <Radar 
+                      name={student.student} 
+                      dataKey="algebra" 
+                      stroke="#8884d8" 
+                      fill="#8884d8" 
+                      fillOpacity={0.3} 
+                    />
+                  </RadarChart>
+                </ChartContainer>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Performance Trends and Top Performers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Weekly Progress */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-teal-600" />
-              Weekly Progress Trend
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analyticsData.weeklyProgress.map((week, index) => (
-                <div key={week.week} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-700">{week.week}</span>
-                    <span className="text-slate-600">Score: {week.avgScore}%</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-1">
-                      <Progress value={week.avgScore} className="h-2" />
-                    </div>
-                    <span className="text-xs text-slate-500 w-16">
-                      {week.participation}% active
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Top Performers */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-teal-600" />
-              Top Performers
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {analyticsData.topPerformers.map((student, index) => (
-                <div key={student.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      index === 0 ? "bg-yellow-100 text-yellow-800" :
-                      index === 1 ? "bg-gray-100 text-gray-800" :
-                      index === 2 ? "bg-orange-100 text-orange-800" :
-                      "bg-blue-100 text-blue-800"
-                    }`}>
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-900">{student.name}</p>
-                      <p className="text-sm text-slate-600">
-                        +{student.improvement}% improvement
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-slate-900">{student.avgScore}%</p>
-                    <p className="text-xs text-slate-500">avg score</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Engagement Metrics */}
+      {/* Weekly Activity Timeline */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-teal-600" />
-            Engagement Metrics
+            <Calendar className="w-5 h-5 text-pink-600" />
+            Weekly Activity Timeline
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-teal-600 mb-2">
-                {analyticsData.engagement.messagesThisWeek}
+          <ChartContainer config={chartConfig} className="h-[300px]">
+            <LineChart data={weeklyActivityData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="week" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line type="monotone" dataKey="messages" stroke="#0EA5E9" strokeWidth={2} />
+              <Line type="monotone" dataKey="sessions" stroke="#10B981" strokeWidth={2} />
+              <Line type="monotone" dataKey="resources" stroke="#F59E0B" strokeWidth={2} />
+              <Line type="monotone" dataKey="quizzes" stroke="#8B5CF6" strokeWidth={2} />
+              <Legend />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+
+      {/* Detailed Topic Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            Detailed Topic Progress
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {topicMasteryData.map((topic) => (
+              <div key={topic.topic} className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="font-medium text-slate-700">{topic.topic}</span>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      topic.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                      topic.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {topic.difficulty}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-slate-900">{topic.mastery}%</span>
+                    <span className="text-slate-500 ml-2">({topic.students} students)</span>
+                  </div>
+                </div>
+                <Progress value={topic.mastery} className="h-3" />
+                <div className="flex justify-between text-xs text-slate-500">
+                  <span>Class Average</span>
+                  <span>{topic.mastery >= 90 ? 'Excellent' : topic.mastery >= 80 ? 'Good' : 'Needs Improvement'}</span>
+                </div>
               </div>
-              <p className="text-sm text-slate-600">Messages This Week</p>
-              <p className="text-xs text-green-600 mt-1">+23% from last week</p>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {analyticsData.engagement.studySessionsThisWeek}
-              </div>
-              <p className="text-sm text-slate-600">Study Sessions</p>
-              <p className="text-xs text-green-600 mt-1">+15% from last week</p>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {analyticsData.performance.participationRate}%
-              </div>
-              <p className="text-sm text-slate-600">Participation Rate</p>
-              <p className="text-xs text-green-600 mt-1">Above target</p>
-            </div>
+            ))}
           </div>
         </CardContent>
       </Card>
